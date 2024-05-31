@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,8 +21,14 @@ public class Activity2 extends AppCompatActivity {
     int player2Rolls = 0;
 
     int maxRolls = 3;
+    int pointsToWin = 50;
     boolean isThereAWinner = false;
     int round = 1;
+
+    double player1Pot = 50.00;
+    double player2Pot = 50.00;
+    double p1BetAmtDouble;
+    double p2BetAmtDouble;
 
     String winner;
 
@@ -43,11 +50,23 @@ public class Activity2 extends AppCompatActivity {
         Button rollDiceP1 = findViewById(R.id.buttonRollDiceP1);
         TextView p1ScoreTextView = findViewById(R.id.player1ScoreTextView);
         TextView p1TotalScoreTextView = findViewById(R.id.p1TotalScore);
+        EditText p1BetEditView = findViewById(R.id.etP1Bet);
+        TextView p1PotTextView= findViewById(R.id.tvP1PotAmt);
 
         //Player 2
         Button rollDiceP2 = findViewById(R.id.buttonRollDiceP2);
         TextView p2ScoreTextView = findViewById(R.id.player2ScoreTextView);
         TextView p2TotalScoreTextView = findViewById(R.id.p2TotalScore);
+        EditText p2BetEditView = findViewById(R.id.etP2Bet);
+        TextView p2PotTextView= findViewById(R.id.tvP2PotAmt);
+
+        //Get player pot balances
+        String p1PotFormattedString = String.format("%.2f", player1Pot);
+        String p2PotFormattedString = String.format("%.2f", player2Pot);
+
+        //Set player pots
+        p1PotTextView.setText(String.valueOf(p1PotFormattedString));
+        p2PotTextView.setText(String.valueOf(p2PotFormattedString));
 
 
         //Set listener for the button and implement methods
@@ -57,23 +76,48 @@ public class Activity2 extends AppCompatActivity {
             public void onClick(View v) {
                 messageBoard.setText("Roll Dice!");
 
-                //Make sure they still have rolls left
-                if(player1Rolls < maxRolls){
-                    int d1 = rollDice();
-                    int d2 = rollDice();
-                    int d3 = rollDice();
+                //Validate bet input
+               try{
+                   p1BetAmtDouble = Double.parseDouble(p1BetEditView.getText().toString());
+               }
+               catch(NumberFormatException e){
+                   Toast.makeText(Activity2.this, "Invalid amount entered", Toast.LENGTH_SHORT).show();
+                   return;
+               }
 
-                    setDiceImage(dice1, d1);
-                    setDiceImage(dice2, d2);
-                    setDiceImage(dice3, d3);
 
-                    int score = addDice(d1, d2, d3);
-                    player1Rolls++;
-                    displayScore(score, p1ScoreTextView);
+
+                //Make sure they've placed a bet
+                if(p1BetAmtDouble != 0){
+                    //Make sure they have enough to cover the bet
+                    if(p1BetAmtDouble > player1Pot){
+                        messageBoard.setText("Player 1 has insufficient funds");
+                    }
+                    else{
+                        //Make sure they still have rolls left
+                        if(player1Rolls < maxRolls){
+                            int d1 = rollDice();
+                            int d2 = rollDice();
+                            int d3 = rollDice();
+
+                            setDiceImage(dice1, d1);
+                            setDiceImage(dice2, d2);
+                            setDiceImage(dice3, d3);
+
+                            int score = addDice(d1, d2, d3);
+                            player1Rolls++;
+                            displayScore(score, p1ScoreTextView);
+                        }
+                        else{
+                            messageBoard.setText("Player 1 has reached the max number of rolls");
+                        }
+                    }
+
                 }
                 else{
-                    messageBoard.setText("Player 1 has reached the max number of rolls");
+                    messageBoard.setText("Player 1, please place your bet");
                 }
+
 
             }//End of rollDiceP1.onClick
         });//End of rollDiceP1.setOnClickListener
@@ -83,23 +127,45 @@ public class Activity2 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 messageBoard.setText("Roll Dice!");
-                //Make sure they still have rolls left
-                if(player2Rolls < maxRolls){
-                    int d1 = rollDice();
-                    int d2 = rollDice();
-                    int d3 = rollDice();
 
-                    setDiceImage(dice1, d1);
-                    setDiceImage(dice2, d2);
-                    setDiceImage(dice3, d3);
+                //Validate bet input
+                try{
+                    p2BetAmtDouble = Double.parseDouble(p2BetEditView.getText().toString());
 
-                    int score = addDice(d1, d2, d3);
-                    player2Rolls++;
-                    displayScore(score, p2ScoreTextView);
+                }
+                catch(NumberFormatException e){
+                    Toast.makeText(Activity2.this, "Invalid amount entered", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //Make sure they've placed a bet
+                if(p2BetAmtDouble != 0){
+                    //Make sure they have enough to cover the bet
+                    if(p2BetAmtDouble > player2Pot){
+                        messageBoard.setText("Player 2 has insufficient funds");
+                    }
+                    else{
+                        //Make sure they still have rolls left
+                        if(player2Rolls < maxRolls){
+                            int d1 = rollDice();
+                            int d2 = rollDice();
+                            int d3 = rollDice();
+
+                            setDiceImage(dice1, d1);
+                            setDiceImage(dice2, d2);
+                            setDiceImage(dice3, d3);
+
+                            int score = addDice(d1, d2, d3);
+                            player2Rolls++;
+                            displayScore(score, p2ScoreTextView);
+                        }
+                        else{
+                            messageBoard.setText("Player 2 has reached the max number of rolls");
+                        }
+                    }
 
                 }
                 else{
-                    messageBoard.setText("Player 2 has reached the max number of rolls");
+                    messageBoard.setText("Player 2, please place your bet");
                 }
 
             }//End of rollDiceP2.onClick
@@ -157,13 +223,19 @@ public class Activity2 extends AppCompatActivity {
                 }
 
                 //Check for winner
-                if(totalScoreP1 >= 100 && totalScoreP2 >= 100){
+                if(totalScoreP1 >= pointsToWin && totalScoreP2 >= pointsToWin){
                     if(totalScoreP1 > totalScoreP2){
                         messageBoard.setText("Player 1 Wins!");
+                        //Update pot amounts
+                        player1Pot += p2BetAmtDouble;
+                        player2Pot -= p2BetAmtDouble;
                         isThereAWinner = true;
                     }
                     else if(totalScoreP2 > totalScoreP1){
                         messageBoard.setText("Player 2 Wins!");
+                        player2Pot += p1BetAmtDouble;
+                        player1Pot -= p1BetAmtDouble;
+
                         isThereAWinner = true;
                     }
                     else{
@@ -171,11 +243,16 @@ public class Activity2 extends AppCompatActivity {
                         isThereAWinner = true;
                     }
                 }
-                else if (totalScoreP1 >= 100) {
-                    messageBoard.setText("Player 1 Wins!");
+                else if (totalScoreP1 >= pointsToWin) {
+                    messageBoard.setText("Player 1 Wins!" );
+                    player1Pot += p2BetAmtDouble;
+                    player2Pot -= p2BetAmtDouble;
                     isThereAWinner = true;
-                } else if (totalScoreP2 >= 100) {
+                }
+                else if (totalScoreP2 >= pointsToWin) {
                     messageBoard.setText("Player 2 Wins!");
+                    player2Pot += p1BetAmtDouble;
+                    player1Pot -= p1BetAmtDouble;
                     isThereAWinner = true;
                 }
 
@@ -186,6 +263,13 @@ public class Activity2 extends AppCompatActivity {
                     isThereAWinner = false;
                     round = 0;
 
+                    //Get player pot balances
+                    String p1PotFormattedString = String.format("%.2f", player1Pot);
+                    String p2PotFormattedString = String.format("%.2f", player2Pot);
+
+                    //Update views
+                    p1PotTextView.setText(String.valueOf(p1PotFormattedString));
+                    p2PotTextView.setText(String.valueOf(p2PotFormattedString));
 
                 }
 
@@ -198,6 +282,9 @@ public class Activity2 extends AppCompatActivity {
                     p1TotalScoreTextView.setText("0");
                     p2ScoreTextView.setText("0");
                     p2TotalScoreTextView.setText("0");
+
+                    p1BetEditView.setText("0.00");
+                    p2BetEditView.setText("0.00");
                 }
 
 
