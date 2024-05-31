@@ -20,7 +20,10 @@ public class Activity2 extends AppCompatActivity {
     int player2Rolls = 0;
 
     int maxRolls = 3;
-    int pointsToWin = 100;
+    boolean isThereAWinner = false;
+    int round = 1;
+
+    String winner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +41,22 @@ public class Activity2 extends AppCompatActivity {
 
         //Player 1
         Button rollDiceP1 = findViewById(R.id.buttonRollDiceP1);
-        TextView p1Score = findViewById(R.id.player1ScoreTextView);
-        TextView p1TotalScore = findViewById(R.id.p1TotalScore);
+        TextView p1ScoreTextView = findViewById(R.id.player1ScoreTextView);
+        TextView p1TotalScoreTextView = findViewById(R.id.p1TotalScore);
 
         //Player 2
         Button rollDiceP2 = findViewById(R.id.buttonRollDiceP2);
-        TextView p2Score = findViewById(R.id.player2ScoreTextView);
-        TextView p2TotalScore = findViewById(R.id.p2TotalScore);
+        TextView p2ScoreTextView = findViewById(R.id.player2ScoreTextView);
+        TextView p2TotalScoreTextView = findViewById(R.id.p2TotalScore);
+
 
         //Set listener for the button and implement methods
         rollDiceP1.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
+                messageBoard.setText("Roll Dice!");
+
                 //Make sure they still have rolls left
                 if(player1Rolls < maxRolls){
                     int d1 = rollDice();
@@ -63,18 +69,20 @@ public class Activity2 extends AppCompatActivity {
 
                     int score = addDice(d1, d2, d3);
                     player1Rolls++;
-                    displayScore(score, p1Score);
-
-
+                    displayScore(score, p1ScoreTextView);
+                }
+                else{
+                    messageBoard.setText("Player 1 has reached the max number of rolls");
                 }
 
-            }
-        });
+            }//End of rollDiceP1.onClick
+        });//End of rollDiceP1.setOnClickListener
 
         //Set listener for the button and implement methods
         rollDiceP2.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                messageBoard.setText("Roll Dice!");
                 //Make sure they still have rolls left
                 if(player2Rolls < maxRolls){
                     int d1 = rollDice();
@@ -87,12 +95,15 @@ public class Activity2 extends AppCompatActivity {
 
                     int score = addDice(d1, d2, d3);
                     player2Rolls++;
-                    displayScore(score, p2Score);
+                    displayScore(score, p2ScoreTextView);
 
                 }
+                else{
+                    messageBoard.setText("Player 2 has reached the max number of rolls");
+                }
 
-            }
-        });
+            }//End of rollDiceP2.onClick
+        });//End of rollDiceP2.setOnClickListener
 
         //Add score and move to the next round
         nextRound.setOnClickListener(new View.OnClickListener(){
@@ -103,55 +114,96 @@ public class Activity2 extends AppCompatActivity {
                 int totalScoreP1 = 0;
                 int totalScoreP2 = 0;
 
-                if (player1Rolls != 0 && player2Rolls != 0) {
+
+                //Make sure players both have rolled
+                if (player1Rolls == 0 && player2Rolls == 0){
+                    messageBoard.setText("Both players still needs to roll");
+                }
+                //Make sure player 1 has rolled
+                else if (player1Rolls == 0 ){
+                    messageBoard.setText("Player 1 still needs to roll");
+                }
+                //Make sure player 2 has rolled
+                else if(player2Rolls == 0){
+                    messageBoard.setText("Player 2 still needs to roll");
+                }
+                else{
                     //Get player 1 score for the round
-                    int p1RoundScore = Integer.parseInt(p1Score.getText().toString());
+                    int p1RoundScore = Integer.parseInt(p1ScoreTextView.getText().toString());
                     //Get player 1 total score
-                    int p1CurrentTotalScore = Integer.parseInt(p1TotalScore.getText().toString());
+                    int p1CurrentTotalScore = Integer.parseInt(p1TotalScoreTextView.getText().toString());
                     //Update the total score
                     totalScoreP1 = addTotalScore(p1CurrentTotalScore, p1RoundScore);
 
-                    p1TotalScore.setText(String.valueOf(totalScoreP1));
+                    p1TotalScoreTextView.setText(String.valueOf(totalScoreP1));
 
                     //Reset number of rolls to 0
                     player1Rolls = 0;
 
                     //Get player 2 score, update total, and display
-                    int p2RoundScore = Integer.parseInt(p2Score.getText().toString());
+                    int p2RoundScore = Integer.parseInt(p2ScoreTextView.getText().toString());
                     ;//Integer.parseInt(String.valueOf(p2Score));
-                    int p2CurrentTotalScore = Integer.parseInt(p2TotalScore.getText().toString());
+                    int p2CurrentTotalScore = Integer.parseInt(p2TotalScoreTextView.getText().toString());
                     ;//Integer.parseInt(String.valueOf(p2TotalScore));
                     totalScoreP2 = addTotalScore(p2CurrentTotalScore, p2RoundScore);
 
-                    p2TotalScore.setText(String.valueOf(totalScoreP2));
+                    p2TotalScoreTextView.setText(String.valueOf(totalScoreP2));
 
                     //Reset number of rolls to 0
                     player2Rolls = 0;
-                } else {
-                    //Make sure player 2 gets a turn
+
+                    //Add 1 to round
+                    round++;
                 }
 
                 //Check for winner
                 if(totalScoreP1 >= 100 && totalScoreP2 >= 100){
                     if(totalScoreP1 > totalScoreP2){
                         messageBoard.setText("Player 1 Wins!");
+                        isThereAWinner = true;
                     }
                     else if(totalScoreP2 > totalScoreP1){
                         messageBoard.setText("Player 2 Wins!");
+                        isThereAWinner = true;
                     }
                     else{
                         messageBoard.setText("Tie Game!");
+                        isThereAWinner = true;
                     }
                 }
                 else if (totalScoreP1 >= 100) {
                     messageBoard.setText("Player 1 Wins!");
+                    isThereAWinner = true;
                 } else if (totalScoreP2 >= 100) {
                     messageBoard.setText("Player 2 Wins!");
+                    isThereAWinner = true;
                 }
-                
 
-            }
-        });
+
+                //Restart
+                if(isThereAWinner){
+                    //Set no winner
+                    isThereAWinner = false;
+                    round = 0;
+
+
+                }
+
+                if(round == 0){
+                    //Reset scores
+                    totalScoreP1 = 0;
+                    totalScoreP2 = 0;
+
+                    p1ScoreTextView.setText("0");
+                    p1TotalScoreTextView.setText("0");
+                    p2ScoreTextView.setText("0");
+                    p2TotalScoreTextView.setText("0");
+                }
+
+
+            }//End of nextRound.onClick
+
+        });//End of nextRound.setOnClickListener
 
     }//End of onCreate()
 
