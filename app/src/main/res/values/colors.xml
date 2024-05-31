@@ -17,4 +17,10 @@
     <color name="RoyalBlue">#4169E1</color>
     <color name="RebeccaPurple">#663399</color>
     <color name="Navy">#000080</color>
+    <color name="DarkMode1">#e4e5f1</color>
+    <color name="DarkMode2">#cacde8</color>
+    <color name="DarkMode3">#777a92</color>
+    <color name="DarkMode4">#25273c</color>
+    <color name="DarkMode5">#161722</color>
+
 </resources>

@@ -26,11 +26,15 @@ public class Activity3 extends AppCompatActivity {
         Button depositBtn = findViewById(R.id.btnDeposit);
         Button withdrawBtn = findViewById(R.id.btnWithdrawal);
         TextView balanceTv = findViewById(R.id.tvAccountBalance);
+        TextView bankNameTv = findViewById(R.id.bankNameTextView);
+        TextView welcomeTv = findViewById(R.id.tvWelcomeMessage);
 
-        accountNani = new Account("10001", 912.15, "Bank of Renton", "Nani", "Pelekai");
+        accountNani = new Account("10001", 912.15, "Bank of Kauai", "Nani", "Pelekai");
 
         //Set balance text view
         balanceTv.setText(String.format("%.2f",accountNani.getBalance()));
+        bankNameTv.setText((accountNani.getBankName()));
+        welcomeTv.setText("Welcome " + accountNani.getCustomerFirstName() + "!");
 
         //Register launcher
         // Register the launcher and define the callback
