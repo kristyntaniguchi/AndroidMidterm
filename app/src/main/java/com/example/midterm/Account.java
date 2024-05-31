@@ -8,9 +8,8 @@ import androidx.annotation.NonNull;
 public class Account implements Parcelable {
 
     private String accountNumber;
-    private String bankName;
-
     private double balance;
+    private String bankName;
     private String customerFirstName;
     private String customerLastName;
 
@@ -23,6 +22,59 @@ public class Account implements Parcelable {
         this.customerLastName = customerLastName;
     }
 
+    public static final Creator<Account> CREATOR = new Creator<Account>() {
+        @Override
+        public Account createFromParcel(Parcel in) {
+            return new Account(in);
+        }
+
+        @Override
+        public Account[] newArray(int size) {
+            return new Account[size];
+        }
+    };
+
+
+    //Getters and setters
+    public String getAccountNumber(){
+        return accountNumber;
+    }
+
+    public double getBalance(){
+        return balance;
+    }
+
+    public void setBalance(double balance){
+        this.balance = balance;
+    }
+
+    public String getBankName(){
+        return bankName;
+    }
+
+    public void setBankName(String bankName) { this.bankName = bankName; }
+
+    public String getCustomerFirstName(){
+        return customerFirstName;
+    }
+
+    public void setCustomerFirstName(String customerFirstName) { this.customerFirstName = customerFirstName;}
+
+    public String getCustomerLastName(){
+        return customerLastName;
+    }
+
+    public void setCustomerLastName(String customerLastName) {this.customerLastName = customerLastName; }
+
+
+
+    protected Account(Parcel in) {
+        accountNumber = in.readString();
+        balance = in.readDouble();
+        bankName = in.readString();
+        customerFirstName = in.readString();
+        customerLastName = in.readString();
+    }
 
     @Override
     public int describeContents() {
@@ -37,28 +89,6 @@ public class Account implements Parcelable {
         dest.writeString(customerFirstName);
         dest.writeString(customerLastName);
     }
-
-    //Getters and setters
-    public String getAccountNumber(){
-        return accountNumber;
-    }
-
-    public double getBalance(){
-        return balance;
-    }
-
-    public String getBankName(){
-        return bankName;
-    }
-
-    public String getCustomerFirstName(){
-        return customerFirstName;
-    }
-
-    public String getCustomerLastName(){
-        return customerLastName;
-    }
-
 
 
 }//End of class
